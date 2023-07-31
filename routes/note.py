@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, File, UploadFile, Form
+from fastapi import APIRouter, Request, File, UploadFile, Form, Response
 from config.db import db
 from models.note import Note
 from fastapi.responses import HTMLResponse
@@ -23,20 +23,23 @@ async def new(
 ):
     if noteFile is not None:
         file_name = noteFile.filename
+        file_type = noteFile.content_type
         data = await noteFile.read()
         fs.put(data, filename=noteFile.filename)
         print("file uploaded")
         # save file to static folder
-        with open(f"static/{noteFile.filename}", "wb") as f:
-            f.write(data)
+        # with open(f"static/{noteFile.filename}", "wb") as f:
+        #     f.write(data)
 
     else:
         file_name = None
+        file_type = None
     new_note = {
         "title": title,
         "desc": desc,
         # "important": important,
         "file": file_name,
+        "file_type": file_type
     }
     inserted_note = Note(**new_note)
     print(inserted_note)
@@ -70,6 +73,14 @@ async def view(request: Request):
 async def delete(id: str):
     db.notes.delete_one({"_id": ObjectId(id)})
     return {"message": "note deleted successfully"}
+
+@note.get("/download/{id}")
+async def download(id: str):
+    note = db.notes.find_one({"_id": ObjectId(id)})
+    file_name = note["file"]
+    file_type = note["file_type"]
+    data = fs.get_last_version(filename=file_name).read()
+    return Response(content=data, media_type=file_type)
 
 # normal form data
 # @note.post("/new")

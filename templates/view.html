@@ -14,10 +14,10 @@
       <div class="card-body">
         <p class="card-text">{{ doc.desc }}</p>
           {% if doc.file %}
-            <a href="/static/{{ doc.file }}" class="btn btn-warning">View {{ doc.file }}</a>
-            <a href="/static/{{ doc.file }}" download class="btn btn-warning">Download {{ doc.file }}</a>
+            <a href="/download/{{ doc.id }}" class="btn btn-warning m-2">View {{ doc.file }}</a>
+            <!-- <a href="/static/{{ doc.file }}" download class="btn btn-warning">Download {{ doc.file }}</a> -->
           {% endif %}
-          <a href="/delete/{{ doc.id }}" class="btn btn-danger">Delete Note</a>
+          <a href="/delete/{{ doc.id }}" class="btn btn-danger m-2">Delete Note</a>
       </div>
     </div>
     {% endfor %}

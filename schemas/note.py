@@ -5,6 +5,7 @@ def noteEntity(item) -> dict:
         "desc": item["desc"],
         # "important": item["important"],
         "file": item["file"],
+        "file_type": item["file_type"],
     }
 
 def notesEntity(items) -> list:
