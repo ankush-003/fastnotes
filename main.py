@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, File, UploadFile, Form
+from fastapi import FastAPI, Request, File, UploadFile, Form, Response
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -7,10 +7,14 @@ from models.note import Note
 from schemas.note import noteEntity, notesEntity
 from typing import Annotated, Union, Optional
 import gridfs
+# from deta import Deta
 from bson import ObjectId
 
 app = FastAPI()
 fs = gridfs.GridFS(db, collection="files")
+
+# deta = Deta("d098QJarhFU7_AzQwFXjrzwM4XyPPWUaoJMQ9udFrbVaf")
+# drive = deta.Drive("notes")
 
 # serving static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -32,20 +36,24 @@ async def new(
 ):
     if noteFile is not None:
         file_name = noteFile.filename
+        file_type = noteFile.content_type
         data = await noteFile.read()
-        fs.put(data, filename=noteFile.filename)
+        fs.put(data, filename=file_name)
         print("file uploaded")
         # save file to static folder
-        with open(f"static/{noteFile.filename}", "wb") as f:
-            f.write(data)
-
+        # with open(f"static/{noteFile.filename}", "wb") as f:
+        #     f.write(data)
+        # save file to deta drive
+        # deta_file = drive.put(file_name, data=data)
     else:
         file_name = None
+        file_type = None
     new_note = {
         "title": title,
         "desc": desc,
         # "important": important,
         "file": file_name,
+        "file_type": file_type
     }
     inserted_note = Note(**new_note)
     print(inserted_note)
@@ -79,3 +87,12 @@ async def view(request: Request):
 async def delete(id: str):
     db.notes.delete_one({"_id": ObjectId(id)})
     return {"message": "note deleted successfully"}
+
+@app.get("/download/{id}")
+async def download(id: str):
+    note = db.notes.find_one({"_id": ObjectId(id)})
+    file_name = note["file"]
+    file_type = note["file_type"]
+    if file_name is not None:
+        data = fs.get_last_version(filename=file_name).read()
+        return Response(content=data, media_type=file_type)   

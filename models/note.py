@@ -6,3 +6,4 @@ class Note(BaseModel):
     desc: str
     # important: bool | None = None
     file: Optional[str] = None
+    file_type: Optional[str] = None
