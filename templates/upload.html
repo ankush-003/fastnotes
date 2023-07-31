@@ -1,0 +1,27 @@
+{% extends "index.html" %}
+{% block title %}Getting Started{% endblock %}
+{% block content %}
+<div class="container mt-5 p-2">
+    <h2 class="text-warning py-2 my-2">Start Adding Notes to Database</h2>
+    <form action="/new" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label for="Input1" class="form-label text-warning">Enter Title</label>
+      <input type="text" class="form-control" id="Input1" placeholder="Note title" name="title" required>
+    </div>
+    <div class="mb-3">
+      <label for="Textarea1" class="form-label text-warning">Enter Description</label>
+      <textarea class="form-control" id="Textarea1" rows="3" placeholder="Note Description" name="desc" required></textarea>
+    </div>
+        <div class="mb-3">
+          <label for="formFile" class="form-label text-warning">Upload File</label>
+          <input class="form-control" type="file" id="formFile" name="noteFile">
+        </div>
+          <button type="submit" class="btn btn-warning">Submit</button>
+    </form>
+</div>
+{% if message %}
+<script>
+    alert("{{ message }}");
+</script>
+{% endif %}
+{% endblock %}

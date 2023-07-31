@@ -1,0 +1,25 @@
+{% extends "index.html" %}
+{% block title %}View Notes{% endblock %}
+{% block content %}
+{% if not newDocs %}
+    <div class="alert alert-danger m-5 px-4" role="alert">
+      <h4 class="alert-heading text-center">No Notes Created Yet !</h4>
+    </div>
+{% else %}
+    {% for doc in newDocs %}
+    <div class="card m-5">
+      <div class="card-header fs-3">
+        {{ doc.title }}
+      </div>
+      <div class="card-body">
+        <p class="card-text">{{ doc.desc }}</p>
+          {% if doc.file %}
+            <a href="/static/{{ doc.file }}" class="btn btn-warning">View {{ doc.file }}</a>
+            <a href="/static/{{ doc.file }}" download class="btn btn-warning">Download {{ doc.file }}</a>
+          {% endif %}
+          <a href="/delete/{{ doc.id }}"></a>
+      </div>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}
