@@ -17,7 +17,7 @@
             <a href="/static/{{ doc.file }}" class="btn btn-warning">View {{ doc.file }}</a>
             <a href="/static/{{ doc.file }}" download class="btn btn-warning">Download {{ doc.file }}</a>
           {% endif %}
-          <a href="/delete/{{ doc.id }}"></a>
+          <a href="/delete/{{ doc.id }}" class="btn btn-danger">Delete Note</a>
       </div>
     </div>
     {% endfor %}
