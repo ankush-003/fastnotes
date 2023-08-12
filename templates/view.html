@@ -16,6 +16,7 @@
           {% if doc.file %}
             <a href="/download/{{ doc.id }}" class="btn btn-warning m-2">View {{ doc.file }}</a>
             <!-- <a href="/static/{{ doc.file }}" download class="btn btn-warning">Download {{ doc.file }}</a> -->
+            <button class="btn btn-warning m-2 copy" onclick="copy('/download/{{ doc.id }}')">Copy link to {{ doc.file }}</button>
           {% endif %}
           <a href="/delete/{{ doc.id }}" class="btn btn-danger m-2">Delete Note</a>
       </div>

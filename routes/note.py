@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, File, UploadFile, Form, Response
 from config.db import db
 from models.note import Note
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from schemas.note import noteEntity, notesEntity
 from typing import Annotated, Union, Optional
@@ -14,8 +14,9 @@ templates: Jinja2Templates = Jinja2Templates(directory="templates")
 
 fs = gridfs.GridFS(db, collection="files")
 
-@note.post("/new")
+@note.post("/new", response_class=HTMLResponse)
 async def new(
+        request: Request,
         title: Annotated[str, Form()],
         desc: Annotated[str, Form()],
         # important: Annotated[bool | None = None, Form()],
@@ -51,7 +52,8 @@ async def new(
     #     print("file uploaded")
     #     with open(f"static{noteFile.filename}", "wb") as f:
     #         f.write(data)
-    return {"message": "note created successfully", "note": new_note}
+    # return {"message": "note created successfully", "note": new_note}
+    return templates.TemplateResponse("upload.html", {"request": request, "message": "note created successfully"})
 
 @note.get("/view", response_class=HTMLResponse)
 async def view(request: Request):
@@ -69,10 +71,14 @@ async def view(request: Request):
     # print(new_docs)
     return templates.TemplateResponse("view.html", {"request": request, "newDocs": new_docs})
 
-@note.get("/delete/{id}")
+@note.get("/delete/{id}", response_class=RedirectResponse)
 async def delete(id: str):
+    note = db.notes.find_one({"_id": ObjectId(id)})
+    file_name = note["file"]
+    fs.delete(fs.find_one({"filename": file_name})._id)
     db.notes.delete_one({"_id": ObjectId(id)})
-    return {"message": "note deleted successfully"}
+    # return {"message": "note deleted successfully"}
+    return RedirectResponse(url="/view")
 
 @note.get("/download/{id}")
 async def download(id: str):
